@@ -15,7 +15,8 @@ def run(rows, color_marks, log):
             cm[COL_F_RECEIVED] = "coral"
             cm[COL_F_RECEIVED+1] = "coral"
             cm[COL_H_RECV_PT] = "coral"
-            cm[15] = "coral"; cm[16] = "coral"
+            cm[15] = "coral"
+            cm[16] = "coral"
 
         if i_str:
             row[COL_K_COMP_PT] = 2
@@ -23,8 +24,9 @@ def run(rows, color_marks, log):
             cm[COL_I_JOB] = "coral"
             cm[COL_I_JOB+1] = "coral"
             cm[COL_K_COMP_PT] = "coral"
-            cm[15] = "coral"; cm[16] = "coral"
+            cm[15] = "coral"
+            cm[16] = "coral"
 
         color_marks[idx] = cm
 
-    log(f"[module4] 基础分写入完成")
+    log("[module4] 基础分写入完成")
