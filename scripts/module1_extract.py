@@ -1,23 +1,26 @@
 import re
-from datetime import datetime
-from sheets_client import open_ss, read_all
-from config import GSB_IDS
+from sheets_client import export_xlsx, read_xlsx_sheets
+from config import GSB_CONFIG
 
 def _parse_units_from_a1(a1_text):
-    m = re.search(r"(\d+)\s+units\b", a1_text or "", re.IGNORECASE)
+    m = re.search(r"(\d+)\s+units\b", str(a1_text or ""), re.IGNORECASE)
     return int(m.group(1)) if m else 0
 
 def run(log):
     rows = []
     color_marks = []
 
-    for gsb_id in GSB_IDS:
-        ss = open_ss(gsb_id)
-        wf_name = ss.title.split("-")[0].strip()
-        log(f"[module1] 处理 {wf_name}")
+    for gsb_id, wf_name in GSB_CONFIG:
+        log(f"[module1] 导出 {wf_name} ({gsb_id[:12]}...)")
+        buf = export_xlsx(gsb_id, log)
+        if buf is None:
+            log(f"[module1] 跳过 {wf_name}")
+            continue
 
-        for ws in ss.worksheets():
-            sheet_name = ws.title
+        sheets_data = read_xlsx_sheets(buf)
+        log(f"[module1] {wf_name} 有 {len(sheets_data)} 个 tab")
+
+        for sheet_name, all_vals in sheets_data.items():
             if sheet_name == "目录":
                 continue
             name_parts = sheet_name.split(" - ")
@@ -28,9 +31,7 @@ def run(log):
             m = re.search(r"Item\s+(\d+)", sheet_name)
             item_no = m.group(1) if m else ""
 
-            all_vals = read_all(ws)
-            last_row = len(all_vals)
-            if last_row <= 3:
+            if len(all_vals) <= 3:
                 continue
 
             a1_text = all_vals[0][0] if all_vals and all_vals[0] else ""
@@ -74,7 +75,7 @@ def run(log):
                     total_units = len(people)
 
             max_len = max(len(received_list), len(completed_list))
-            link_formula = f'=HYPERLINK("https://docs.google.com/spreadsheets/d/{gsb_id}/edit#gid={ws.id}", "{wf_name}")'
+            link_formula = f'=HYPERLINK("https://docs.google.com/spreadsheets/d/{gsb_id}/edit", "{wf_name}")'
 
             for i in range(max_len):
                 recv = received_list[i] if i < len(received_list) else (None, None)
@@ -88,6 +89,7 @@ def run(log):
                 if recv[0]:
                     row[5] = recv[0]
                     row[6] = recv[1]
+
                 cm = {}
                 if job_name:
                     row[8] = job_name
@@ -104,9 +106,12 @@ def run(log):
                         cm = {13: "red", 15: "red", 16: "red"}
                 else:
                     row[13] = 1
+
                 row[14] = total_units
                 if total_units == 0:
-                    cm[14] = "blue"; cm[15] = "blue"; cm[16] = "blue"
+                    cm[14] = "blue"
+                    cm[15] = "blue"
+                    cm[16] = "blue"
 
                 rows.append(row)
                 color_marks.append(cm)
