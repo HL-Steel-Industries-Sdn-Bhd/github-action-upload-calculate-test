@@ -10,6 +10,12 @@ def run(log):
     rows = []
     color_marks = []
 
+    # 调试计数
+    stat_total_tabs = 0
+    stat_name_ok = 0
+    stat_short_skip = 0
+    stat_no_albert = 0
+
     for gsb_id, wf_name in GSB_CONFIG:
         log(f"[module1] 导出 {wf_name} ({gsb_id[:12]}...)")
         buf = export_xlsx(gsb_id, log)
@@ -21,17 +27,23 @@ def run(log):
         log(f"[module1] {wf_name} 有 {len(sheets_data)} 个 tab")
 
         for sheet_name, all_vals in sheets_data.items():
+            stat_total_tabs += 1
+
             if sheet_name == "目录":
                 continue
             name_parts = sheet_name.split(" - ")
             if len(name_parts) < 3 or not name_parts[0].startswith("SO-"):
                 continue
 
+            stat_name_ok += 1
             sales_order = name_parts[0].strip()
             m = re.search(r"Item\s+(\d+)", sheet_name)
             item_no = m.group(1) if m else ""
 
             if len(all_vals) <= 3:
+                stat_short_skip += 1
+                if stat_short_skip <= 5:
+                    log(f"  ⛔ 跳过短 tab: {sheet_name} (行数={len(all_vals)})")
                 continue
 
             a1_text = all_vals[0][0] if all_vals and all_vals[0] else ""
@@ -69,6 +81,9 @@ def run(log):
                         job_to_units[job_completed] += float(unit)
                     except (ValueError, TypeError):
                         pass
+
+            if not received_list and not completed_list:
+                stat_no_albert += 1
 
             for job, people in job_to_people.items():
                 if total_units == 1 and len(people) > 1:
@@ -115,5 +130,8 @@ def run(log):
 
                 rows.append(row)
                 color_marks.append(cm)
+
+    log(f"[module1] 统计: 总 tab={stat_total_tabs}, 名字合格={stat_name_ok}, "
+        f"太短跳过={stat_short_skip}, 无 Albert 数据={stat_no_albert}, 最终行数={len(rows)}")
 
     return rows, color_marks
