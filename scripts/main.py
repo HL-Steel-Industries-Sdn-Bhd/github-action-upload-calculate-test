@@ -28,7 +28,9 @@ def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=True)
 
 def apply_colors(sheet, color_marks):
+    """一次性 batchUpdate 应用所有背景色"""
     requests = []
+    # 先把整片 A2:Q 刷白
     requests.append({
         "repeatCell": {
             "range": {"sheetId": sheet.id,
@@ -101,7 +103,7 @@ def main():
         log("写标题...")
         record.update("A1", [RECORD_HEADERS])
         summary.update("A1", [[SUMMARY_HEADERS_AB[0], SUMMARY_HEADERS_AB[1]]])
-        summary.update("E1", [[SUMMARY_E1_LABEL, grand_total]])
+        summary.update("D1", [[SUMMARY_E1_LABEL, grand_total]])
 
         if rows:
             log(f"写 Record，{len(rows)} 行...")
