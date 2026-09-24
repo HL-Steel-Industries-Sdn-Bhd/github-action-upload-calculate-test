@@ -1,0 +1,9 @@
+# 绝对不要 commit 这些
+*.json
+!package.json
+sa.json
+*sa*.json
+.env
+__pycache__/
+*.pyc
+.DS_Store
