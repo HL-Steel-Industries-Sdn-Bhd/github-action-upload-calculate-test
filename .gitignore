@@ -1,4 +1,4 @@
-# 绝对不要 commit 这些
+# 绝对不要 commit 任何 key / json
 *.json
 !package.json
 sa.json
@@ -7,3 +7,5 @@ sa.json
 __pycache__/
 *.pyc
 .DS_Store
+*.xlsx
+*.csv
