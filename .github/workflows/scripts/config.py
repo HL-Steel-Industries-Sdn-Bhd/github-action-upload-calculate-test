@@ -4,13 +4,14 @@
 
 TARGET_SS_ID = "1P8-PVmRWDjgPGZ5HjpzHNXEelPWnpDhnXEupaMxnFxI"
 
-GSB_IDS = [
-    "11RS7BsU5O7pZwciypzMhpX2DoEEgivAgpSJup9pjrDY",  # Work Flow 12
-    "1oZd56HEhPGIEWgZiEjGMarIneUg7dGQCXTNXDv0qJjQ",  # Work Flow 11
-    "195mcmMLz-w3ZT8FwZU5WAq5DPHc7PTrpxsesScl12Ms",  # Work Flow 10
-    "1n5zoYU_yVRyc-xmxhdQVoE2g3_aeMkGlamc8FPtLm64",  # Work Flow 9
-    "1vFBZX0w0zBARy67Z4kRtDK8AKthjdozphp3GGljF8ZQ",  # Work Flow 8
-    "1z992OeG5E7yBMp6wTJ0pDdTd-X-7NJJje0Qz8IQhLq8",  # Work Flow 7
+# 源表：ID + Work Flow 名
+GSB_CONFIG = [
+    ("11RS7BsU5O7pZwciypzMhpX2DoEEgivAgpSJup9pjrDY", "Work Flow 12"),
+    ("1oZd56HEhPGIEWgZiEjGMarIneUg7dGQCXTNXDv0qJjQ", "Work Flow 11"),
+    ("195mcmMLz-w3ZT8FwZU5WAq5DPHc7PTrpxsesScl12Ms", "Work Flow 10"),
+    ("1n5zoYU_yVRyc-xmxhdQVoE2g3_aeMkGlamc8FPtLm64", "Work Flow 9"),
+    ("1vFBZX0w0zBARy67Z4kRtDK8AKthjdozphp3GGljF8ZQ", "Work Flow 8"),
+    ("1z992OeG5E7yBMp6wTJ0pDdTd-X-7NJJje0Qz8IQhLq8", "Work Flow 7"),
 ]
 
 GSC_ID = "1GuME9-Dkef1QCOq1ROvzoVYzNpp7W5zn2rcqcoy6mxM"
