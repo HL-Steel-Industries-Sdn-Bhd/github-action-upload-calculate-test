@@ -1,0 +1,42 @@
+name: Daily Contribution Compute
+
+on:
+  repository_dispatch:
+    types: [daily_contribution]
+  workflow_dispatch:
+
+concurrency:
+  group: daily-contribution
+  cancel-in-progress: false
+
+jobs:
+  compute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Write SA JSON
+        run: |
+          cat > /tmp/sa.json << 'EOF'
+          ${{ secrets.GOOGLE_SA_JSON }}
+          EOF
+
+      - name: Run pipeline
+        env:
+          GOOGLE_SA_JSON: /tmp/sa.json
+        run: python scripts/main.py
+
+      - name: Cleanup
+        if: always()
+        run: rm -f /tmp/sa.json
