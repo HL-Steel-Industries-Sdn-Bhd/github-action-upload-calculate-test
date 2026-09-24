@@ -1,10 +1,16 @@
-from sheets_client import open_ss, read_all
+from sheets_client import export_xlsx, read_xlsx_sheets
 from config import GSC_ID, COL_I_JOB, COL_E_DIFFICULTY
 
 def run(rows, log):
-    ss = open_ss(GSC_ID)
-    ws = ss.get_worksheet(0)
-    data = read_all(ws)
+    log("[module3] 导出 GSC 难度表...")
+    buf = export_xlsx(GSC_ID, log)
+    if buf is None:
+        log("[module3] GSC 导出失败，跳过")
+        return
+
+    sheets_data = read_xlsx_sheets(buf)
+    first_sheet_name = list(sheets_data.keys())[0]
+    data = sheets_data[first_sheet_name]
 
     job_map = {}
     for r in data[1:]:
@@ -21,4 +27,4 @@ def run(rows, log):
         else:
             row[COL_E_DIFFICULTY] = job_map.get(job, "")
 
-    log(f"[module3] 难度写入完成")
+    log("[module3] 难度写入完成")
