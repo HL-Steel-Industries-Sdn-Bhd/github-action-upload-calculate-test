@@ -1,5 +1,5 @@
 from datetime import datetime
-from sheets_client import open_ss, read_all
+from sheets_client import export_xlsx, read_xlsx_sheets
 from config import (GSC_ID, COL_I_JOB, COL_G_RECV_TIME,
                     COL_J_COMP_TIME, COL_L_INTERVAL, COL_M_EFFECTIVE)
 
@@ -18,9 +18,15 @@ def _to_dt(v):
     return None
 
 def run(rows, color_marks, log):
-    ss = open_ss(GSC_ID)
-    ws = ss.get_worksheet(0)
-    data = read_all(ws)
+    log("[module5] 导出 GSC 最小间隔表...")
+    buf = export_xlsx(GSC_ID, log)
+    if buf is None:
+        log("[module5] GSC 导出失败，跳过")
+        return
+
+    sheets_data = read_xlsx_sheets(buf)
+    first_sheet_name = list(sheets_data.keys())[0]
+    data = sheets_data[first_sheet_name]
 
     min_interval_map = {}
     for r in data[1:]:
@@ -48,10 +54,11 @@ def run(rows, color_marks, log):
             if result == 0:
                 cm[COL_L_INTERVAL] = "yellow"
                 cm[COL_M_EFFECTIVE] = "yellow"
-                cm[15] = "yellow"; cm[16] = "yellow"
+                cm[15] = "yellow"
+                cm[16] = "yellow"
         else:
             row[COL_M_EFFECTIVE] = 1
 
         color_marks[idx] = cm
 
-    log(f"[module5] 时间间隔写入完成")
+    log("[module5] 时间间隔写入完成")
