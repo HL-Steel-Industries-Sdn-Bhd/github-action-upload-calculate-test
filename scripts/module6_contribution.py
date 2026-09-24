@@ -17,7 +17,8 @@ def run(rows, color_marks, log):
         if so in ("SO-000000", "SO-999999"):
             for c in (COL_B_SO, COL_C_ITEM, COL_D_PRICE, COL_E_DIFFICULTY):
                 cm[c] = "chocolate"
-            cm[15] = "chocolate"; cm[16] = "chocolate"
+            cm[15] = "chocolate"
+            cm[16] = "chocolate"
 
         if row[COL_N_ALBERT_UNIT] == "N/A":
             o = row[COL_O_TOTAL_UNIT]
@@ -44,4 +45,4 @@ def run(rows, color_marks, log):
 
         color_marks[idx] = cm
 
-    log(f"[module6] 贡献分计算完成")
+    log("[module6] 贡献分计算完成")
