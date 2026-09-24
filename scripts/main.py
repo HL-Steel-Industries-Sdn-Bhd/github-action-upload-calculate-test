@@ -1,6 +1,6 @@
 import sys
 import traceback
-from datetime import datetime
+from datetime import datetime, date
 
 from sheets_client import open_ss, ensure_sheet
 from config import (TARGET_SS_ID, RECORD_SHEET, SUMMARY_SHEET,
@@ -27,10 +27,18 @@ COLOR_MAP = {
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=True)
 
+def sanitize(v):
+    if isinstance(v, datetime):
+        return v.strftime("%Y-%m-%d %H:%M:%S")
+    if isinstance(v, date):
+        return v.strftime("%Y-%m-%d")
+    return v
+
+def sanitize_rows(rows):
+    return [[sanitize(cell) for cell in row] for row in rows]
+
 def apply_colors(sheet, color_marks):
-    """一次性 batchUpdate 应用所有背景色"""
     requests = []
-    # 先把整片 A2:Q 刷白
     requests.append({
         "repeatCell": {
             "range": {"sheetId": sheet.id,
@@ -101,19 +109,21 @@ def main():
         summary.clear()
 
         log("写标题...")
-        record.update("A1", [RECORD_HEADERS])
-        summary.update("A1", [[SUMMARY_HEADERS_AB[0], SUMMARY_HEADERS_AB[1]]])
-        summary.update("D1", [[SUMMARY_E1_LABEL, grand_total]])
+        record.update(values=[RECORD_HEADERS], range_name="A1")
+        summary.update(values=[[SUMMARY_HEADERS_AB[0], SUMMARY_HEADERS_AB[1]]], range_name="A1")
+        summary.update(values=[[SUMMARY_E1_LABEL, grand_total]], range_name="D1")
 
         if rows:
             log(f"写 Record，{len(rows)} 行...")
-            record.update(f"A2:Q{len(rows)+1}", rows,
+            rows_clean = sanitize_rows(rows)
+            record.update(values=rows_clean,
+                          range_name=f"A2:Q{len(rows_clean)+1}",
                           value_input_option="USER_ENTERED")
 
         if summary_rows:
             log(f"写 Summary，{len(summary_rows)} 行...")
-            summary.update(f"A2:B{len(summary_rows)+1}",
-                           [[r[0], r[1]] for r in summary_rows])
+            summary.update(values=[[r[0], r[1]] for r in summary_rows],
+                           range_name=f"A2:B{len(summary_rows)+1}")
 
         log("应用颜色...")
         apply_colors(record, color_marks)
